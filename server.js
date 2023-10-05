@@ -18,6 +18,8 @@ async function connectDB() {
 
 connectDB()
 
+app.set('view engine','ejs')
+
 app.use(express.urlencoded({extended:true}));
 app.use(express.static('public'))
 
@@ -36,10 +38,20 @@ const formEntrySchema = new mongoose.Schema({
             email:req.body.email,
         });
         await newEntry.save()
-        res.send('form data saved')
+        res.redirect('display')
     }catch(error){
         console.log("Error serving data",error);
         res.status(500).send("Internal server error")
+    }
+  })
+
+  app.get('/display',async (req,res)=>{
+    try {
+        const data = await FormEntry.find({})
+        res.render('displayData',{data})
+    } catch (error) {
+        console.error('error fetching data from mongodb')
+        res.status(500).send('internal server error')
     }
   })
 
